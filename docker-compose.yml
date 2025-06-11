@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourPassword123
+    ports:
+      - "1433:1433"
+    volumes:
+      - "C:/Users/pauls/Downloads/Srimanjary (3)/Srimanjary.mdf:/dbfiles/Srimanjary.mdf"
+      - "C:/Users/pauls/Downloads/Srimanjary (3)/Srimanjary_log.ldf:/dbfiles/Srimanjary_log.ldf"
+
+    restart: always
+
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - sqlserver
+    environment:
+      - DB_SERVER=sqlserver
+      - DB_NAME=Srimanjary
+      - DB_USER=sa
+      - DB_PASSWORD=YourPassword123  # Ensure this matches SQL Server password
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: always
